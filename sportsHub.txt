@@ -2324,3 +2324,1292 @@ SELECT * FROM v_player_leaderboard;
 -- =====================================================================
 -- END OF SPORTSHUB DATABASE
 -- =====================================================================
+
+
+mysql> -- ============================================================
+mysql> -- SPORTSHUB QUERY BANK WITH OUTPUTS
+mysql> -- Q1 - Q62
+mysql> -- ============================================================
+mysql>
+mysql> -- Q1
+mysql> SELECT * FROM sports;
++----------+------------+--------------------------------------------------+-----------+
+| sport_id | sport_name | description                                      | is_active |
++----------+------------+--------------------------------------------------+-----------+
+|        1 | Cricket    | Cricket with live runs, wickets and match events |         1 |
+|        2 | Football   | Football with goals, cards and match events      |         1 |
+|        3 | Basketball | Basketball with point and quarter events         |         1 |
+|        4 | Badminton  | Badminton with set and point events              |         1 |
+|        5 | Tennis     | Tennis with set, game and point events           |         1 |
+|        6 | Volleyball | Volleyball with set and point events             |         1 |
++----------+------------+--------------------------------------------------+-----------+
+6 rows in set (0.01 sec)
+
+mysql>
+mysql> -- Q2
+mysql> SELECT user_id, full_name, email, role, city
+    -> FROM users
+    -> WHERE is_active = TRUE;
++---------+--------------+----------------------+--------+---------------+
+| user_id | full_name    | email                | role   | city          |
++---------+--------------+----------------------+--------+---------------+
+|       1 | Nikhil       | nikhil@sportshub.com | PLAYER | Visakhapatnam |
+|       2 | Rahul Sharma | rahul@sportshub.com  | PLAYER | Visakhapatnam |
+|       3 | Priya Reddy  | priya@sportshub.com  | VIEWER | Visakhapatnam |
+|       4 | Suresh Kumar | suresh@sportshub.com | OWNER  | Visakhapatnam |
+|       5 | Admin User   | admin@sportshub.com  | ADMIN  | Visakhapatnam |
+|       6 | Arjun Rao    | arjun@sportshub.com  | PLAYER | Visakhapatnam |
+|       7 | Kiran Das    | kiran@sportshub.com  | PLAYER | Visakhapatnam |
+|       8 | Vamsi Teja   | vamsi@sportshub.com  | PLAYER | Visakhapatnam |
++---------+--------------+----------------------+--------+---------------+
+8 rows in set (0.01 sec)
+
+mysql>
+mysql> -- Q3
+mysql> SELECT user_id, full_name, email, city
+    -> FROM users
+    -> WHERE role = 'PLAYER';
++---------+--------------+----------------------+---------------+
+| user_id | full_name    | email                | city          |
++---------+--------------+----------------------+---------------+
+|       1 | Nikhil       | nikhil@sportshub.com | Visakhapatnam |
+|       2 | Rahul Sharma | rahul@sportshub.com  | Visakhapatnam |
+|       6 | Arjun Rao    | arjun@sportshub.com  | Visakhapatnam |
+|       7 | Kiran Das    | kiran@sportshub.com  | Visakhapatnam |
+|       8 | Vamsi Teja   | vamsi@sportshub.com  | Visakhapatnam |
++---------+--------------+----------------------+---------------+
+5 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q4
+mysql> SELECT
+    ->     t.team_id,
+    ->     t.team_name,
+    ->     s.sport_name,
+    ->     u.full_name AS creator,
+    ->     t.city
+    -> FROM teams t
+    -> JOIN sports s ON t.sport_id = s.sport_id
+    -> JOIN users u ON t.created_by = u.user_id;
++---------+-------------------+------------+--------------+---------------+
+| team_id | team_name         | sport_name | creator      | city          |
++---------+-------------------+------------+--------------+---------------+
+|       5 | Shuttle Stars     | Badminton  | Vamsi Teja   | Visakhapatnam |
+|       4 | Hoop Warriors     | Basketball | Kiran Das    | Visakhapatnam |
+|       8 | Vizag Dunkers     | Basketball | Arjun Rao    | Visakhapatnam |
+|       1 | Royal Strikers    | Cricket    | Nikhil       | Visakhapatnam |
+|       2 | Vizag Warriors    | Cricket    | Rahul Sharma | Visakhapatnam |
+|       3 | Vizag FC          | Football   | Nikhil       | Visakhapatnam |
+|       6 | Vizag Tennis Club | Tennis     | Arjun Rao    | Visakhapatnam |
+|       7 | Beach Spikers     | Volleyball | Kiran Das    | Visakhapatnam |
++---------+-------------------+------------+--------------+---------------+
+8 rows in set (0.01 sec)
+
+mysql>
+mysql> -- Q5
+mysql> SELECT
+    ->     facility_id,
+    ->     facility_name,
+    ->     facility_type,
+    ->     city,
+    ->     price_per_hour
+    -> FROM facilities
+    -> WHERE approval_status = 'APPROVED'
+    ->   AND is_active = TRUE;
++-------------+-------------------------+---------------+---------------+----------------+
+| facility_id | facility_name           | facility_type | city          | price_per_hour |
++-------------+-------------------------+---------------+---------------+----------------+
+|           1 | Vizag Cricket Arena     | GROUND        | Visakhapatnam |        1200.00 |
+|           2 | Beachside Football Turf | TURF          | Visakhapatnam |         900.00 |
+|           3 | City Basketball Court   | COURT         | Visakhapatnam |         700.00 |
+|           4 | Shuttle Arena           | COURT         | Visakhapatnam |         500.00 |
+|           5 | Vizag Tennis Court      | COURT         | Visakhapatnam |         650.00 |
++-------------+-------------------------+---------------+---------------+----------------+
+5 rows in set (0.01 sec)
+
+mysql>
+mysql> -- Q6
+mysql> SELECT
+    ->     t.team_id,
+    ->     t.team_name,
+    ->     t.city
+    -> FROM teams t
+    -> JOIN sports s ON t.sport_id = s.sport_id
+    -> WHERE s.sport_name = 'Cricket';
++---------+----------------+---------------+
+| team_id | team_name      | city          |
++---------+----------------+---------------+
+|       1 | Royal Strikers | Visakhapatnam |
+|       2 | Vizag Warriors | Visakhapatnam |
++---------+----------------+---------------+
+2 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q7
+mysql> SELECT
+    ->     s.sport_name,
+    ->     COUNT(t.team_id) AS total_teams
+    -> FROM sports s
+    -> LEFT JOIN teams t ON s.sport_id = t.sport_id
+    -> GROUP BY s.sport_id, s.sport_name;
++------------+-------------+
+| sport_name | total_teams |
++------------+-------------+
+| Badminton  |           1 |
+| Basketball |           2 |
+| Cricket    |           2 |
+| Football   |           1 |
+| Tennis     |           1 |
+| Volleyball |           1 |
++------------+-------------+
+6 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q8
+mysql> SELECT
+    ->     t.team_name,
+    ->     u.full_name,
+    ->     tm.member_role
+    -> FROM team_members tm
+    -> JOIN teams t ON tm.team_id = t.team_id
+    -> JOIN users u ON tm.user_id = u.user_id
+    -> WHERE t.team_id = 1;
++----------------+--------------+-------------+
+| team_name      | full_name    | member_role |
++----------------+--------------+-------------+
+| Royal Strikers | Nikhil       | CAPTAIN     |
+| Royal Strikers | Rahul Sharma | PLAYER      |
+| Royal Strikers | Arjun Rao    | SCORER      |
++----------------+--------------+-------------+
+3 rows in set (0.01 sec)
+
+mysql>
+mysql> -- Q9
+mysql> SELECT
+    ->     t.team_name,
+    ->     s.sport_name
+    -> FROM teams t
+    -> JOIN sports s ON t.sport_id = s.sport_id
+    -> WHERE t.created_by = 1;
++----------------+------------+
+| team_name      | sport_name |
++----------------+------------+
+| Royal Strikers | Cricket    |
+| Vizag FC       | Football   |
++----------------+------------+
+2 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q10
+mysql> SELECT
+    ->     t.tournament_name,
+    ->     s.sport_name,
+    ->     u.full_name AS organizer,
+    ->     t.city,
+    ->     t.start_date,
+    ->     t.end_date,
+    ->     t.registration_fee,
+    ->     t.status
+    -> FROM tournaments t
+    -> JOIN sports s ON t.sport_id = s.sport_id
+    -> JOIN users u ON t.organizer_id = u.user_id;
++-----------------------+------------+--------------+---------------+------------+------------+------------------+----------+
+| tournament_name       | sport_name | organizer    | city          | start_date | end_date   | registration_fee | status   |
++-----------------------+------------+--------------+---------------+------------+------------+------------------+----------+
+| Vizag Cricket Cup     | Cricket    | Suresh Kumar | Visakhapatnam | 2026-11-01 | 2026-11-10 |          1500.00 | OPEN     |
+| Vizag Football League | Football   | Suresh Kumar | Visakhapatnam | 2026-11-15 | 2026-11-25 |          1000.00 | UPCOMING |
++-----------------------+------------+--------------+---------------+------------+------------+------------------+----------+
+2 rows in set (0.01 sec)
+
+mysql>
+mysql> -- Q11
+mysql> SELECT
+    ->     tournament_name,
+    ->     sport_id,
+    ->     start_date,
+    ->     end_date,
+    ->     registration_fee
+    -> FROM tournaments
+    -> WHERE status = 'OPEN';
++-------------------+----------+------------+------------+------------------+
+| tournament_name   | sport_id | start_date | end_date   | registration_fee |
++-------------------+----------+------------+------------+------------------+
+| Vizag Cricket Cup |        1 | 2026-11-01 | 2026-11-10 |          1500.00 |
++-------------------+----------+------------+------------+------------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q12
+mysql> SELECT
+    ->     tournament_name,
+    ->     registered_team_ids
+    -> FROM tournaments
+    -> WHERE tournament_id = 1;
++-------------------+---------------------+
+| tournament_name   | registered_team_ids |
++-------------------+---------------------+
+| Vizag Cricket Cup | [1, 2]              |
++-------------------+---------------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q13
+mysql> SELECT *
+    -> FROM v_match_list
+    -> WHERE status = 'SCHEDULED'
+    -> ORDER BY match_date, start_time;
++----------+------------+----------------+----------------+------------+------------+------------+-----------+---------+---------+
+| match_id | sport_name | team_a         | team_b         | match_date | start_time | match_type | status    | score_a | score_b |
++----------+------------+----------------+----------------+------------+------------+------------+-----------+---------+---------+
+|        2 | Football   | Vizag FC       | NULL           | 2026-10-25 | 17:00:00   | OPPONENT   | SCHEDULED |       0 |       0 |
+|        3 | Basketball | Hoop Warriors  | Vizag Dunkers  | 2026-10-28 | 18:00:00   | NORMAL     | SCHEDULED |       0 |       0 |
+|        1 | Cricket    | Royal Strikers | Vizag Warriors | 2026-11-02 | 16:00:00   | TOURNAMENT | SCHEDULED |       0 |       0 |
++----------+------------+----------------+----------------+------------+------------+------------+-----------+---------+---------+
+3 rows in set (0.01 sec)
+
+mysql>
+mysql> -- Q14
+mysql> SELECT *
+    -> FROM v_match_list
+    -> WHERE status = 'LIVE';
+Empty set (0.00 sec)
+
+mysql>
+mysql> -- Q15
+mysql> SELECT
+    ->     m.match_id,
+    ->     s.sport_name,
+    ->     a.team_name AS team_a,
+    ->     b.team_name AS team_b,
+    ->     m.match_date,
+    ->     m.start_time,
+    ->     m.status
+    -> FROM matches m
+    -> JOIN sports s ON m.sport_id = s.sport_id
+    -> JOIN teams a ON m.team_a_id = a.team_id
+    -> LEFT JOIN teams b ON m.team_b_id = b.team_id;
++----------+------------+----------------+----------------+------------+------------+-----------+
+| match_id | sport_name | team_a         | team_b         | match_date | start_time | status    |
++----------+------------+----------------+----------------+------------+------------+-----------+
+|        1 | Cricket    | Royal Strikers | Vizag Warriors | 2026-11-02 | 16:00:00   | SCHEDULED |
+|        2 | Football   | Vizag FC       | NULL           | 2026-10-25 | 17:00:00   | SCHEDULED |
+|        3 | Basketball | Hoop Warriors  | Vizag Dunkers  | 2026-10-28 | 18:00:00   | SCHEDULED |
++----------+------------+----------------+----------------+------------+------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q16
+mysql> SELECT
+    ->     m.match_id,
+    ->     t.team_name AS requesting_team,
+    ->     s.sport_name,
+    ->     m.match_date,
+    ->     m.start_time,
+    ->     m.search_radius_km,
+    ->     m.request_message
+    -> FROM matches m
+    -> JOIN teams t ON m.team_a_id = t.team_id
+    -> JOIN sports s ON m.sport_id = s.sport_id
+    -> WHERE m.match_type = 'OPPONENT'
+    ->   AND m.request_status IN ('OPEN','PENDING');
++----------+-----------------+------------+------------+------------+------------------+-----------------+
+| match_id | requesting_team | sport_name | match_date | start_time | search_radius_km | request_message |
++----------+-----------------+------------+------------+------------+------------------+-----------------+
+|        2 | Vizag FC        | Football   | 2026-10-25 | 17:00:00   |            10.00 | NULL            |
++----------+-----------------+------------+------------+------------+------------------+-----------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q17
+mysql> SET @my_lat = 17.7200;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SET @my_lon = 83.3000;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SET @sport = 1;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SET @my_team = 1;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SET @radius = 10;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql>
+mysql> SELECT
+    ->     t.team_id,
+    ->     t.team_name,
+    ->     s.sport_name,
+    ->     t.city,
+    ->     ROUND(
+    ->         6371 * ACOS(
+    ->             LEAST(1, GREATEST(-1,
+    ->                 COS(RADIANS(@my_lat)) *
+    ->                 COS(RADIANS(t.latitude)) *
+    ->                 COS(RADIANS(t.longitude) - RADIANS(@my_lon)) +
+    ->                 SIN(RADIANS(@my_lat)) *
+    ->                 SIN(RADIANS(t.latitude))
+    ->             ))
+    ->         ), 2
+    ->     ) AS distance_km
+    -> FROM teams t
+    -> JOIN sports s ON t.sport_id = s.sport_id
+    -> WHERE t.sport_id = @sport
+    ->   AND t.team_id <> @my_team
+    ->   AND t.is_active = TRUE
+    -> HAVING distance_km <= @radius
+    -> ORDER BY distance_km;
++---------+----------------+------------+---------------+-------------+
+| team_id | team_name      | sport_name | city          | distance_km |
++---------+----------------+------------+---------------+-------------+
+|       2 | Vizag Warriors | Cricket    | Visakhapatnam |        0.21 |
++---------+----------------+------------+---------------+-------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q18
+mysql> SET @user_lat = 17.6868;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SET @user_lon = 83.2185;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SET @facility_radius = 10;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql>
+mysql> SELECT
+    ->     f.facility_name,
+    ->     s.sport_name,
+    ->     f.facility_type,
+    ->     f.price_per_hour,
+    ->     ROUND(
+    ->         6371 * ACOS(
+    ->             LEAST(1, GREATEST(-1,
+    ->                 COS(RADIANS(@user_lat)) *
+    ->                 COS(RADIANS(f.latitude)) *
+    ->                 COS(RADIANS(f.longitude) - RADIANS(@user_lon)) +
+    ->                 SIN(RADIANS(@user_lat)) *
+    ->                 SIN(RADIANS(f.latitude))
+    ->             ))
+    ->         ), 2
+    ->     ) AS distance_km
+    -> FROM facilities f
+    -> JOIN sports s ON f.sport_id = s.sport_id
+    -> WHERE f.approval_status = 'APPROVED'
+    ->   AND f.is_active = TRUE
+    -> HAVING distance_km <= @facility_radius
+    -> ORDER BY distance_km;
++--------------------+------------+---------------+----------------+-------------+
+| facility_name      | sport_name | facility_type | price_per_hour | distance_km |
++--------------------+------------+---------------+----------------+-------------+
+| Vizag Tennis Court | Tennis     | COURT         |         650.00 |        9.01 |
+| Shuttle Arena      | Badminton  | COURT         |         500.00 |        9.39 |
++--------------------+------------+---------------+----------------+-------------+
+2 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q19
+mysql> SELECT
+    ->     b.booking_id,
+    ->     f.facility_name,
+    ->     b.booking_date,
+    ->     b.start_time,
+    ->     b.end_time,
+    ->     b.amount,
+    ->     b.booking_status,
+    ->     b.payment_status
+    -> FROM bookings b
+    -> JOIN facilities f ON b.facility_id = f.facility_id
+    -> WHERE b.user_id = 1
+    -> ORDER BY b.booking_date DESC;
++------------+---------------------+--------------+------------+----------+---------+----------------+----------------+
+| booking_id | facility_name       | booking_date | start_time | end_time | amount  | booking_status | payment_status |
++------------+---------------------+--------------+------------+----------+---------+----------------+----------------+
+|          1 | Vizag Cricket Arena | 2026-10-26   | 16:00:00   | 18:00:00 | 2400.00 | CONFIRMED      | PAID           |
++------------+---------------------+--------------+------------+----------+---------+----------------+----------------+
+1 row in set (0.01 sec)
+
+mysql>
+mysql> -- Q20
+mysql> SELECT
+    ->     booking_id,
+    ->     start_time,
+    ->     end_time,
+    ->     booking_status
+    -> FROM bookings
+    -> WHERE facility_id = 1
+    ->   AND booking_date = '2026-10-26'
+    ->   AND booking_status IN ('PENDING','CONFIRMED');
++------------+------------+----------+----------------+
+| booking_id | start_time | end_time | booking_status |
++------------+------------+----------+----------------+
+|          1 | 16:00:00   | 18:00:00 | CONFIRMED      |
++------------+------------+----------+----------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q21
+mysql> SELECT
+    ->     facility_id,
+    ->     SUM(amount) AS total_revenue
+    -> FROM bookings
+    -> WHERE payment_status = 'PAID'
+    -> GROUP BY facility_id;
++-------------+---------------+
+| facility_id | total_revenue |
++-------------+---------------+
+|           1 |       2400.00 |
+|           4 |        500.00 |
++-------------+---------------+
+2 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q22
+mysql> SELECT
+    ->     user_id,
+    ->     full_name,
+    ->     matches_played,
+    ->     wins,
+    ->     losses,
+    ->     points,
+    ->     runs
+    -> FROM v_player_leaderboard
+    -> WHERE sport_name = 'Cricket'
+    -> ORDER BY points DESC, runs DESC;
++---------+--------------+----------------+------+--------+--------+------+
+| user_id | full_name    | matches_played | wins | losses | points | runs |
++---------+--------------+----------------+------+--------+--------+------+
+|       1 | Nikhil       |              5 |    3 |      2 |     18 |  210 |
+|       2 | Rahul Sharma |              4 |    2 |      2 |     12 |  150 |
++---------+--------------+----------------+------+--------+--------+------+
+2 rows in set (0.04 sec)
+
+mysql>
+mysql> -- Q23
+mysql> SELECT
+    ->     notification_id,
+    ->     title,
+    ->     message,
+    ->     notification_type,
+    ->     created_at
+    -> FROM notifications
+    -> WHERE user_id = 1
+    ->   AND is_read = FALSE
+    -> ORDER BY created_at DESC;
++-----------------+-------------------+-------------------------------------------+-------------------+---------------------+
+| notification_id | title             | message                                   | notification_type | created_at          |
++-----------------+-------------------+-------------------------------------------+-------------------+---------------------+
+|               1 | Booking Confirmed | Your cricket ground booking is confirmed. | BOOKING           | 2026-10-24 21:09:50 |
+|               2 | Match Request     | Your opponent search is open.             | MATCH             | 2026-10-24 21:09:50 |
++-----------------+-------------------+-------------------------------------------+-------------------+---------------------+
+2 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q24
+mysql> SELECT
+    ->     f.facility_id,
+    ->     f.facility_name,
+    ->     ROUND(AVG(r.rating), 2) AS average_rating,
+    ->     COUNT(r.review_id) AS total_reviews
+    -> FROM facilities f
+    -> LEFT JOIN reviews r ON f.facility_id = r.facility_id
+    -> GROUP BY f.facility_id, f.facility_name;
++-------------+-------------------------+----------------+---------------+
+| facility_id | facility_name           | average_rating | total_reviews |
++-------------+-------------------------+----------------+---------------+
+|           1 | Vizag Cricket Arena     |           5.00 |             1 |
+|           2 | Beachside Football Turf |           NULL |             0 |
+|           3 | City Basketball Court   |           NULL |             0 |
+|           4 | Shuttle Arena           |           4.00 |             1 |
+|           5 | Vizag Tennis Court      |           NULL |             0 |
+|           6 | Beach Volleyball Court  |           NULL |             0 |
++-------------+-------------------------+----------------+---------------+
+6 rows in set (0.02 sec)
+
+mysql>
+mysql> -- Q25
+mysql> SELECT
+    ->     me.event_id,
+    ->     t.team_name,
+    ->     me.event_type,
+    ->     me.points,
+    ->     me.period_no,
+    ->     me.event_time,
+    ->     me.description
+    -> FROM match_events me
+    -> JOIN teams t ON me.team_id = t.team_id
+    -> WHERE me.match_id = 1
+    -> ORDER BY me.event_id;
++----------+----------------+------------+--------+-----------+------------+------------------------+
+| event_id | team_name      | event_type | points | period_no | event_time | description            |
++----------+----------------+------------+--------+-----------+------------+------------------------+
+|        1 | Royal Strikers | FOUR       |      4 |         1 | 16:12:00   | Batsman hit a boundary |
+|        2 | Royal Strikers | SIX        |      6 |         1 | 16:18:00   | Batsman hit a six      |
+|        3 | Vizag Warriors | WICKET     |      0 |         1 | 16:25:00   | Caught                 |
++----------+----------------+------------+--------+-----------+------------+------------------------+
+3 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q26
+mysql> SELECT
+    ->     team_id,
+    ->     SUM(points) AS total_points
+    -> FROM match_events
+    -> WHERE match_id = 1
+    -> GROUP BY team_id;
++---------+--------------+
+| team_id | total_points |
++---------+--------------+
+|       1 |           10 |
+|       2 |            0 |
++---------+--------------+
+2 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q27
+mysql> SELECT
+    ->     m.match_id,
+    ->     s.sport_name,
+    ->     a.team_name AS team_a,
+    ->     b.team_name AS team_b,
+    ->     m.match_date,
+    ->     m.status,
+    ->     m.score_a,
+    ->     m.score_b
+    -> FROM matches m
+    -> JOIN sports s ON m.sport_id = s.sport_id
+    -> JOIN teams a ON m.team_a_id = a.team_id
+    -> LEFT JOIN teams b ON m.team_b_id = b.team_id
+    -> WHERE m.team_a_id = 1
+    ->    OR m.team_b_id = 1
+    -> ORDER BY m.match_date DESC;
++----------+------------+----------------+----------------+------------+-----------+---------+---------+
+| match_id | sport_name | team_a         | team_b         | match_date | status    | score_a | score_b |
++----------+------------+----------------+----------------+------------+-----------+---------+---------+
+|        1 | Cricket    | Royal Strikers | Vizag Warriors | 2026-11-02 | SCHEDULED |       0 |       0 |
++----------+------------+----------------+----------------+------------+-----------+---------+---------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q28
+mysql> SELECT
+    ->     u.full_name,
+    ->     s.sport_name,
+    ->     ps.wins,
+    ->     ps.losses
+    -> FROM player_statistics ps
+    -> JOIN users u ON ps.user_id = u.user_id
+    -> JOIN sports s ON ps.sport_id = s.sport_id
+    -> WHERE ps.wins > ps.losses;
++------------+------------+------+--------+
+| full_name  | sport_name | wins | losses |
++------------+------------+------+--------+
+| Nikhil     | Cricket    |    3 |      2 |
+| Nikhil     | Football   |    2 |      1 |
+| Kiran Das  | Basketball |    3 |      1 |
+| Vamsi Teja | Badminton  |    4 |      1 |
++------------+------------+------+--------+
+4 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q29
+mysql> SELECT
+    ->     s.sport_name,
+    ->     COUNT(m.match_id) AS total_matches
+    -> FROM sports s
+    -> LEFT JOIN matches m ON s.sport_id = m.sport_id
+    -> GROUP BY s.sport_id, s.sport_name
+    -> ORDER BY total_matches DESC;
++------------+---------------+
+| sport_name | total_matches |
++------------+---------------+
+| Basketball |             1 |
+| Cricket    |             1 |
+| Football   |             1 |
+| Badminton  |             0 |
+| Tennis     |             0 |
+| Volleyball |             0 |
++------------+---------------+
+6 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q30
+mysql> SELECT
+    ->     facility_name,
+    ->     facility_type,
+    ->     price_per_hour,
+    ->     city
+    -> FROM facilities
+    -> WHERE approval_status = 'APPROVED'
+    ->   AND price_per_hour <= 800
+    -> ORDER BY price_per_hour;
++-----------------------+---------------+----------------+---------------+
+| facility_name         | facility_type | price_per_hour | city          |
++-----------------------+---------------+----------------+---------------+
+| Shuttle Arena         | COURT         |         500.00 | Visakhapatnam |
+| Vizag Tennis Court    | COURT         |         650.00 | Visakhapatnam |
+| City Basketball Court | COURT         |         700.00 | Visakhapatnam |
++-----------------------+---------------+----------------+---------------+
+3 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q31
+mysql> SELECT
+    ->     tournament_name,
+    ->     sport_id,
+    ->     venue,
+    ->     start_date,
+    ->     end_date,
+    ->     status
+    -> FROM tournaments
+    -> WHERE city = 'Visakhapatnam'
+    -> ORDER BY start_date;
++-----------------------+----------+-------------------------+------------+------------+----------+
+| tournament_name       | sport_id | venue                   | start_date | end_date   | status   |
++-----------------------+----------+-------------------------+------------+------------+----------+
+| Vizag Cricket Cup     |        1 | Vizag Cricket Arena     | 2026-11-01 | 2026-11-10 | OPEN     |
+| Vizag Football League |        2 | Beachside Football Turf | 2026-11-15 | 2026-11-25 | UPCOMING |
++-----------------------+----------+-------------------------+------------+------------+----------+
+2 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q32
+mysql> SELECT
+    ->     u.full_name AS owner_name,
+    ->     f.facility_name,
+    ->     s.sport_name,
+    ->     f.approval_status
+    -> FROM facilities f
+    -> JOIN users u ON f.owner_id = u.user_id
+    -> JOIN sports s ON f.sport_id = s.sport_id
+    -> ORDER BY u.full_name;
++--------------+-------------------------+------------+-----------------+
+| owner_name   | facility_name           | sport_name | approval_status |
++--------------+-------------------------+------------+-----------------+
+| Suresh Kumar | Vizag Cricket Arena     | Cricket    | APPROVED        |
+| Suresh Kumar | Beachside Football Turf | Football   | APPROVED        |
+| Suresh Kumar | City Basketball Court   | Basketball | APPROVED        |
+| Suresh Kumar | Shuttle Arena           | Badminton  | APPROVED        |
+| Suresh Kumar | Vizag Tennis Court      | Tennis     | APPROVED        |
+| Suresh Kumar | Beach Volleyball Court  | Volleyball | PENDING         |
++--------------+-------------------------+------------+-----------------+
+6 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q33
+mysql> SELECT
+    ->     f.facility_name,
+    ->     s.sport_name,
+    ->     f.price_per_hour
+    -> FROM facilities f
+    -> JOIN sports s ON f.sport_id = s.sport_id
+    -> WHERE f.price_per_hour = (
+    ->     SELECT MAX(f2.price_per_hour)
+    ->     FROM facilities f2
+    ->     WHERE f2.sport_id = f.sport_id
+    -> );
++-------------------------+------------+----------------+
+| facility_name           | sport_name | price_per_hour |
++-------------------------+------------+----------------+
+| Vizag Cricket Arena     | Cricket    |        1200.00 |
+| Beachside Football Turf | Football   |         900.00 |
+| City Basketball Court   | Basketball |         700.00 |
+| Shuttle Arena           | Badminton  |         500.00 |
+| Vizag Tennis Court      | Tennis     |         650.00 |
+| Beach Volleyball Court  | Volleyball |         600.00 |
++-------------------------+------------+----------------+
+6 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q34
+mysql> SELECT
+    ->     u.user_id,
+    ->     u.full_name,
+    ->     COUNT(tm.team_id) AS team_count
+    -> FROM users u
+    -> JOIN team_members tm ON u.user_id = tm.user_id
+    -> GROUP BY u.user_id, u.full_name
+    -> HAVING COUNT(tm.team_id) > 1;
++---------+--------------+------------+
+| user_id | full_name    | team_count |
++---------+--------------+------------+
+|       1 | Nikhil       |          3 |
+|       2 | Rahul Sharma |          2 |
+|       6 | Arjun Rao    |          4 |
+|       7 | Kiran Das    |          3 |
++---------+--------------+------------+
+4 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q35
+mysql> SELECT
+    ->     u.full_name,
+    ->     t.team_name,
+    ->     s.sport_name,
+    ->     tm.member_role
+    -> FROM team_members tm
+    -> JOIN users u ON tm.user_id = u.user_id
+    -> JOIN teams t ON tm.team_id = t.team_id
+    -> JOIN sports s ON t.sport_id = s.sport_id
+    -> WHERE tm.user_id = 1;
++-----------+----------------+------------+-------------+
+| full_name | team_name      | sport_name | member_role |
++-----------+----------------+------------+-------------+
+| Nikhil    | Royal Strikers | Cricket    | CAPTAIN     |
+| Nikhil    | Vizag FC       | Football   | CAPTAIN     |
+| Nikhil    | Shuttle Stars  | Badminton  | PLAYER      |
++-----------+----------------+------------+-------------+
+3 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q36
+mysql> SELECT *
+    -> FROM v_match_list
+    -> WHERE status = 'COMPLETED'
+    -> ORDER BY match_date DESC;
+Empty set (0.00 sec)
+
+mysql>
+mysql> -- Q37
+mysql> SELECT
+    ->     facility_id,
+    ->     facility_name,
+    ->     owner_id,
+    ->     sport_id,
+    ->     city,
+    ->     created_at
+    -> FROM facilities
+    -> WHERE approval_status = 'PENDING';
++-------------+------------------------+----------+----------+---------------+---------------------+
+| facility_id | facility_name          | owner_id | sport_id | city          | created_at          |
++-------------+------------------------+----------+----------+---------------+---------------------+
+|           6 | Beach Volleyball Court |        4 |        6 | Visakhapatnam | 2026-10-24 21:09:50 |
++-------------+------------------------+----------+----------+---------------+---------------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- ============================================================
+mysql> -- Q38-Q45 MODIFY DATABASE
+mysql> -- Execute these in order
+mysql> -- ============================================================
+mysql>
+mysql> -- Q38
+mysql> UPDATE notifications
+    -> SET is_read = TRUE
+    -> WHERE notification_id = 1
+    ->   AND user_id = 1;
+Query OK, 1 row affected (0.03 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql>
+mysql> -- Q39
+mysql> UPDATE facilities
+    -> SET price_per_hour = 1300.00
+    -> WHERE facility_id = 1;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql>
+mysql> -- Q40
+mysql> UPDATE facilities
+    -> SET approval_status = 'APPROVED'
+    -> WHERE facility_id = 6;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql>
+mysql> -- Q41
+mysql> UPDATE matches
+    -> SET
+    ->     team_b_id = 2,
+    ->     request_status = 'ACCEPTED'
+    -> WHERE match_id = 2
+    ->   AND match_type = 'OPPONENT';
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql>
+mysql> -- Q42
+mysql> UPDATE matches
+    -> SET status = 'LIVE'
+    -> WHERE match_id = 1;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql>
+mysql> -- Q43
+mysql> INSERT INTO match_events
+    -> (match_id, team_id, player_id, event_type, points, period_no, description)
+    -> VALUES
+    -> (1, 1, 1, 'FOUR', 4, 1, 'Boundary scored');
+Query OK, 1 row affected (0.01 sec)
+
+mysql>
+mysql> -- Q44
+mysql> INSERT INTO match_events
+    -> (match_id, team_id, player_id, event_type, points, period_no, description)
+    -> VALUES
+    -> (3, 4, 7, 'GOAL', 1, 1, 'Goal scored');
+Query OK, 1 row affected (0.01 sec)
+
+mysql>
+mysql> -- Q45
+mysql> INSERT INTO match_events
+    -> (match_id, team_id, player_id, event_type, points, period_no, description)
+    -> VALUES
+    -> (3, 4, 7, 'THREE_POINT', 3, 1, 'Three point shot');
+Query OK, 1 row affected (0.00 sec)
+
+mysql>
+mysql> -- ============================================================
+mysql> -- Q46-Q62
+mysql> -- ============================================================
+mysql>
+mysql> -- Q46
+mysql> SELECT
+    ->     match_id,
+    ->     COUNT(*) AS total_events
+    -> FROM match_events
+    -> GROUP BY match_id;
++----------+--------------+
+| match_id | total_events |
++----------+--------------+
+|        1 |            4 |
+|        3 |            3 |
++----------+--------------+
+2 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q47
+mysql> SELECT
+    ->     match_id,
+    ->     MAX(points) AS highest_event_points
+    -> FROM match_events
+    -> WHERE match_id = 1
+    -> GROUP BY match_id;
++----------+----------------------+
+| match_id | highest_event_points |
++----------+----------------------+
+|        1 |                    6 |
++----------+----------------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q48
+mysql> SELECT
+    ->     u.full_name,
+    ->     r.rating,
+    ->     r.review_text,
+    ->     r.created_at
+    -> FROM reviews r
+    -> JOIN users u ON r.user_id = u.user_id
+    -> WHERE r.facility_id = 1
+    -> ORDER BY r.created_at DESC;
++-----------+--------+----------------------------------------+---------------------+
+| full_name | rating | review_text                            | created_at          |
++-----------+--------+----------------------------------------+---------------------+
+| Nikhil    |      5 | Excellent ground and good maintenance. | 2026-10-24 21:09:50 |
++-----------+--------+----------------------------------------+---------------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q49
+mysql> SELECT
+    ->     f.facility_id,
+    ->     f.facility_name,
+    ->     ROUND(AVG(r.rating), 2) AS average_rating
+    -> FROM facilities f
+    -> JOIN reviews r ON f.facility_id = r.facility_id
+    -> GROUP BY f.facility_id, f.facility_name
+    -> HAVING AVG(r.rating) >= 4;
++-------------+---------------------+----------------+
+| facility_id | facility_name       | average_rating |
++-------------+---------------------+----------------+
+|           1 | Vizag Cricket Arena |           5.00 |
+|           4 | Shuttle Arena       |           4.00 |
++-------------+---------------------+----------------+
+2 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q50
+mysql> SET @tour_lat = 17.7000;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SET @tour_lon = 83.2900;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql>
+mysql> SELECT
+    ->     tournament_name,
+    ->     city,
+    ->     venue,
+    ->     ROUND(
+    ->         6371 * ACOS(
+    ->             LEAST(1, GREATEST(-1,
+    ->                 COS(RADIANS(@tour_lat)) *
+    ->                 COS(RADIANS(latitude)) *
+    ->                 COS(RADIANS(longitude) - RADIANS(@tour_lon)) +
+    ->                 SIN(RADIANS(@tour_lat)) *
+    ->                 SIN(RADIANS(latitude))
+    ->             ))
+    ->         ), 2
+    ->     ) AS distance_km
+    -> FROM tournaments
+    -> WHERE status IN ('OPEN','UPCOMING')
+    -> HAVING distance_km <= 20
+    -> ORDER BY distance_km;
++-----------------------+---------------+-------------------------+-------------+
+| tournament_name       | city          | venue                   | distance_km |
++-----------------------+---------------+-------------------------+-------------+
+| Vizag Football League | Visakhapatnam | Beachside Football Turf |        3.37 |
+| Vizag Cricket Cup     | Visakhapatnam | Vizag Cricket Arena     |        4.03 |
++-----------------------+---------------+-------------------------+-------------+
+2 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q51
+mysql> SELECT
+    ->     b.booking_id,
+    ->     u.full_name,
+    ->     f.facility_name,
+    ->     b.amount,
+    ->     b.payment_status
+    -> FROM bookings b
+    -> JOIN users u ON b.user_id = u.user_id
+    -> JOIN facilities f ON b.facility_id = f.facility_id
+    -> WHERE b.payment_status <> 'PAID';
++------------+-----------+-------------------------+--------+----------------+
+| booking_id | full_name | facility_name           | amount | payment_status |
++------------+-----------+-------------------------+--------+----------------+
+|          3 | Arjun Rao | Beachside Football Turf | 900.00 | PENDING        |
++------------+-----------+-------------------------+--------+----------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q52
+mysql> SELECT
+    ->     u.full_name AS owner_name,
+    ->     SUM(b.amount) AS total_revenue
+    -> FROM bookings b
+    -> JOIN facilities f ON b.facility_id = f.facility_id
+    -> JOIN users u ON f.owner_id = u.user_id
+    -> WHERE b.payment_status = 'PAID'
+    -> GROUP BY u.user_id, u.full_name;
++--------------+---------------+
+| owner_name   | total_revenue |
++--------------+---------------+
+| Suresh Kumar |       2900.00 |
++--------------+---------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q53
+mysql> SELECT
+    ->     s.sport_name,
+    ->     COUNT(m.match_id) AS match_count
+    -> FROM sports s
+    -> LEFT JOIN matches m ON s.sport_id = m.sport_id
+    -> GROUP BY s.sport_id, s.sport_name
+    -> ORDER BY match_count DESC
+    -> LIMIT 1;
++------------+-------------+
+| sport_name | match_count |
++------------+-------------+
+| Basketball |           1 |
++------------+-------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q54
+mysql> SELECT
+    ->     u.full_name,
+    ->     s.sport_name,
+    ->     ps.wins
+    -> FROM player_statistics ps
+    -> JOIN users u ON ps.user_id = u.user_id
+    -> JOIN sports s ON ps.sport_id = s.sport_id
+    -> WHERE ps.wins > 2
+    -> ORDER BY ps.wins DESC;
++------------+------------+------+
+| full_name  | sport_name | wins |
++------------+------------+------+
+| Vamsi Teja | Badminton  |    4 |
+| Nikhil     | Cricket    |    3 |
+| Kiran Das  | Basketball |    3 |
++------------+------------+------+
+3 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q55
+mysql> SELECT *
+    -> FROM v_approved_facilities
+    -> ORDER BY sport_name, price_per_hour;
++-------------+-------------------------+------------+---------------+---------------+---------------+-------------+-------------+----------------+-------------------+
+| facility_id | facility_name           | sport_name | facility_type | city          | address       | latitude    | longitude   | price_per_hour | image_url         |
++-------------+-------------------------+------------+---------------+---------------+---------------+-------------+-------------+----------------+-------------------+
+|           4 | Shuttle Arena           | Badminton  | COURT         | Visakhapatnam | Dwaraka Nagar | 17.72000000 | 83.30000000 |         500.00 | badminton.jpg     |
+|           3 | City Basketball Court   | Basketball | COURT         | Visakhapatnam | Maddilapalem  | 17.73000000 | 83.31000000 |         700.00 | basketball.jpg    |
+|           1 | Vizag Cricket Arena     | Cricket    | GROUND        | Visakhapatnam | MVP Colony    | 17.73500000 | 83.30000000 |        1300.00 | cricket_arena.jpg |
+|           2 | Beachside Football Turf | Football   | TURF          | Visakhapatnam | Beach Road    | 17.71000000 | 83.32000000 |         900.00 | football_turf.jpg |
+|           5 | Vizag Tennis Court      | Tennis     | COURT         | Visakhapatnam | Siripuram     | 17.71000000 | 83.30000000 |         650.00 | tennis.jpg        |
+|           6 | Beach Volleyball Court  | Volleyball | COURT         | Visakhapatnam | RK Beach      | 17.71500000 | 83.32000000 |         600.00 | volleyball.jpg    |
++-------------+-------------------------+------------+---------------+---------------+---------------+-------------+-------------+----------------+-------------------+
+6 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q56
+mysql> SELECT *
+    -> FROM v_player_leaderboard
+    -> ORDER BY points DESC, wins DESC;
++---------+--------------+------------+----------------+------+--------+--------+------+-------+
+| user_id | full_name    | sport_name | matches_played | wins | losses | points | runs | goals |
++---------+--------------+------------+----------------+------+--------+--------+------+-------+
+|       8 | Vamsi Teja   | Badminton  |              5 |    4 |      1 |     30 |    0 |     0 |
+|       7 | Kiran Das    | Basketball |              4 |    3 |      1 |     22 |    0 |     0 |
+|       1 | Nikhil       | Cricket    |              5 |    3 |      2 |     18 |  210 |     0 |
+|       2 | Rahul Sharma | Cricket    |              4 |    2 |      2 |     12 |  150 |     0 |
+|       1 | Nikhil       | Football   |              3 |    2 |      1 |      6 |    0 |     4 |
++---------+--------------+------------+----------------+------+--------+--------+------+-------+
+5 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q57
+mysql> SELECT
+    ->     n.notification_id,
+    ->     u.full_name,
+    ->     n.title,
+    ->     n.message
+    -> FROM notifications n
+    -> JOIN users u ON n.user_id = u.user_id
+    -> WHERE n.is_read = FALSE;
++-----------------+--------------+---------------+-----------------------------------------+
+| notification_id | full_name    | title         | message                                 |
++-----------------+--------------+---------------+-----------------------------------------+
+|               2 | Nikhil       | Match Request | Your opponent search is open.           |
+|               3 | Rahul Sharma | Tournament    | Vizag Cricket Cup registration is open. |
++-----------------+--------------+---------------+-----------------------------------------+
+2 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q58
+mysql> SELECT
+    ->     u.full_name,
+    ->     s.sport_name,
+    ->     ps.matches_played
+    -> FROM player_statistics ps
+    -> JOIN users u ON ps.user_id = u.user_id
+    -> JOIN sports s ON ps.sport_id = s.sport_id
+    -> WHERE ps.matches_played > 3
+    -> ORDER BY ps.matches_played DESC;
++--------------+------------+----------------+
+| full_name    | sport_name | matches_played |
++--------------+------------+----------------+
+| Nikhil       | Cricket    |              5 |
+| Vamsi Teja   | Badminton  |              5 |
+| Rahul Sharma | Cricket    |              4 |
+| Kiran Das    | Basketball |              4 |
++--------------+------------+----------------+
+4 rows in set (0.00 sec)
+
+mysql>
+mysql> -- Q59
+mysql> SELECT
+    ->     facility_name,
+    ->     available_from,
+    ->     available_to,
+    ->     price_per_hour
+    -> FROM facilities
+    -> WHERE facility_id = 1;
++---------------------+----------------+--------------+----------------+
+| facility_name       | available_from | available_to | price_per_hour |
++---------------------+----------------+--------------+----------------+
+| Vizag Cricket Arena | 06:00:00       | 22:00:00     |        1300.00 |
++---------------------+----------------+--------------+----------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q60
+mysql> SET @facility = 1;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SET @date = '2026-10-26';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SET @new_start = '17:00:00';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SET @new_end = '19:00:00';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql>
+mysql> SELECT
+    ->     booking_id,
+    ->     start_time,
+    ->     end_time,
+    ->     booking_status
+    -> FROM bookings
+    -> WHERE facility_id = @facility
+    ->   AND booking_date = @date
+    ->   AND booking_status IN ('PENDING','CONFIRMED')
+    ->   AND start_time < @new_end
+    ->   AND end_time > @new_start;
++------------+------------+----------+----------------+
+| booking_id | start_time | end_time | booking_status |
++------------+------------+----------+----------------+
+|          1 | 16:00:00   | 18:00:00 | CONFIRMED      |
++------------+------------+----------+----------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q61
+mysql> SELECT
+    ->     m.match_id,
+    ->     t.team_name AS requesting_team,
+    ->     s.sport_name,
+    ->     m.match_date,
+    ->     m.start_time,
+    ->     m.request_status
+    -> FROM matches m
+    -> JOIN teams t ON m.team_a_id = t.team_id
+    -> JOIN sports s ON m.sport_id = s.sport_id
+    -> WHERE m.match_type = 'OPPONENT';
++----------+-----------------+------------+------------+------------+----------------+
+| match_id | requesting_team | sport_name | match_date | start_time | request_status |
++----------+-----------------+------------+------------+------------+----------------+
+|        2 | Vizag FC        | Football   | 2026-10-25 | 17:00:00   | ACCEPTED       |
++----------+-----------------+------------+------------+------------+----------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> -- Q62
+mysql> SELECT
+    ->     m.match_id,
+    ->     s.sport_name,
+    ->     a.team_name AS team_a,
+    ->     b.team_name AS team_b,
+    ->     m.match_date,
+    ->     m.start_time,
+    ->     m.match_type,
+    ->     m.status,
+    ->     m.score_a,
+    ->     m.score_b
+    -> FROM matches m
+    -> JOIN sports s ON m.sport_id = s.sport_id
+    -> JOIN teams a ON m.team_a_id = a.team_id
+    -> LEFT JOIN teams b ON m.team_b_id = b.team_id
+    -> ORDER BY m.match_date, m.start_time;
++----------+------------+----------------+----------------+------------+------------+------------+-----------+---------+---------+
+| match_id | sport_name | team_a         | team_b         | match_date | start_time | match_type | status    | score_a | score_b |
++----------+------------+----------------+----------------+------------+------------+------------+-----------+---------+---------+
+|        2 | Football   | Vizag FC       | Vizag Warriors | 2026-10-25 | 17:00:00   | OPPONENT   | SCHEDULED |       0 |       0 |
+|        3 | Basketball | Hoop Warriors  | Vizag Dunkers  | 2026-10-28 | 18:00:00   | NORMAL     | SCHEDULED |       0 |       0 |
+|        1 | Cricket    | Royal Strikers | Vizag Warriors | 2026-11-02 | 16:00:00   | TOURNAMENT | LIVE      |       0 |       0 |
++----------+------------+----------------+----------------+------------+------------+------------+-----------+---------+---------+
+3 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- ============================================================
+mysql> -- PART 16 — DEMO CALLS
+mysql> -- ============================================================
+mysql>
+mysql> -- DEMO 1
+mysql> CALL sp_nearby_facilities(17.6868, 83.2185, 10);
++-------------+--------------------+------------+---------------+---------------+----------------+-------------+
+| facility_id | facility_name      | sport_name | facility_type | city          | price_per_hour | distance_km |
++-------------+--------------------+------------+---------------+---------------+----------------+-------------+
+|           5 | Vizag Tennis Court | Tennis     | COURT         | Visakhapatnam |         650.00 |        9.01 |
+|           4 | Shuttle Arena      | Badminton  | COURT         | Visakhapatnam |         500.00 |        9.39 |
++-------------+--------------------+------------+---------------+---------------+----------------+-------------+
+2 rows in set (0.01 sec)
+
+Query OK, 0 rows affected (0.02 sec)
+
+mysql>
+mysql> -- DEMO 2
+mysql> CALL sp_find_opponents(1, 1, 17.7200, 83.3000, 10);
++---------+----------------+------------+---------------+-------------+
+| team_id | team_name      | sport_name | city          | distance_km |
++---------+----------------+------------+---------------+-------------+
+|       2 | Vizag Warriors | Cricket    | Visakhapatnam |        0.21 |
++---------+----------------+------------+---------------+-------------+
+1 row in set (0.00 sec)
+
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>
+mysql> -- DEMO 3
+mysql> CALL sp_match_score(1);
++----------+------------+----------------+----------------+---------+---------+--------+
+| match_id | sport_name | team_a         | team_b         | score_a | score_b | status |
++----------+------------+----------------+----------------+---------+---------+--------+
+|        1 | Cricket    | Royal Strikers | Vizag Warriors |       0 |       0 | LIVE   |
++----------+------------+----------------+----------------+---------+---------+--------+
+1 row in set (0.00 sec)
+
++----------+---------+-----------+------------+--------+-----------+------------+------------------------+
+| event_id | team_id | player_id | event_type | points | period_no | event_time | description            |
++----------+---------+-----------+------------+--------+-----------+------------+------------------------+
+|        1 |       1 |         1 | FOUR       |      4 |         1 | 16:12:00   | Batsman hit a boundary |
+|        2 |       1 |         2 | SIX        |      6 |         1 | 16:18:00   | Batsman hit a six      |
+|        3 |       2 |         6 | WICKET     |      0 |         1 | 16:25:00   | Caught                 |
+|        5 |       1 |         1 | FOUR       |      4 |         1 | NULL       | Boundary scored        |
++----------+---------+-----------+------------+--------+-----------+------------+------------------------+
+4 rows in set (0.01 sec)
+
+Query OK, 0 rows affected (0.02 sec)
+
+mysql>
+mysql> -- DEMO 4
+mysql> SELECT * FROM v_active_teams;
++---------+-------------------+------------+--------------+---------------+-------------+-------------+
+| team_id | team_name         | sport_name | created_by   | city          | latitude    | longitude   |
++---------+-------------------+------------+--------------+---------------+-------------+-------------+
+|       1 | Royal Strikers    | Cricket    | Nikhil       | Visakhapatnam | 17.70000000 | 83.29000000 |
+|       2 | Vizag Warriors    | Cricket    | Rahul Sharma | Visakhapatnam | 17.72150000 | 83.30120000 |
+|       3 | Vizag FC          | Football   | Nikhil       | Visakhapatnam | 17.68680000 | 83.21850000 |
+|       4 | Hoop Warriors     | Basketball | Kiran Das    | Visakhapatnam | 17.71000000 | 83.27000000 |
+|       5 | Shuttle Stars     | Badminton  | Vamsi Teja   | Visakhapatnam | 17.73000000 | 83.31000000 |
+|       6 | Vizag Tennis Club | Tennis     | Arjun Rao    | Visakhapatnam | 17.70000000 | 83.29000000 |
+|       7 | Beach Spikers     | Volleyball | Kiran Das    | Visakhapatnam | 17.71000000 | 83.27000000 |
+|       8 | Vizag Dunkers     | Basketball | Arjun Rao    | Visakhapatnam | 17.72000000 | 83.30000000 |
++---------+-------------------+------------+--------------+---------------+-------------+-------------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT * FROM v_approved_facilities;
++-------------+-------------------------+------------+---------------+---------------+---------------+-------------+-------------+----------------+-------------------+
+| facility_id | facility_name           | sport_name | facility_type | city          | address       | latitude    | longitude   | price_per_hour | image_url         |
++-------------+-------------------------+------------+---------------+---------------+---------------+-------------+-------------+----------------+-------------------+
+|           1 | Vizag Cricket Arena     | Cricket    | GROUND        | Visakhapatnam | MVP Colony    | 17.73500000 | 83.30000000 |        1300.00 | cricket_arena.jpg |
+|           2 | Beachside Football Turf | Football   | TURF          | Visakhapatnam | Beach Road    | 17.71000000 | 83.32000000 |         900.00 | football_turf.jpg |
+|           3 | City Basketball Court   | Basketball | COURT         | Visakhapatnam | Maddilapalem  | 17.73000000 | 83.31000000 |         700.00 | basketball.jpg    |
+|           4 | Shuttle Arena           | Badminton  | COURT         | Visakhapatnam | Dwaraka Nagar | 17.72000000 | 83.30000000 |         500.00 | badminton.jpg     |
+|           5 | Vizag Tennis Court      | Tennis     | COURT         | Visakhapatnam | Siripuram     | 17.71000000 | 83.30000000 |         650.00 | tennis.jpg        |
+|           6 | Beach Volleyball Court  | Volleyball | COURT         | Visakhapatnam | RK Beach      | 17.71500000 | 83.32000000 |         600.00 | volleyball.jpg    |
++-------------+-------------------------+------------+---------------+---------------+---------------+-------------+-------------+----------------+-------------------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT * FROM v_match_list;
++----------+------------+----------------+----------------+------------+------------+------------+-----------+---------+---------+
+| match_id | sport_name | team_a         | team_b         | match_date | start_time | match_type | status    | score_a | score_b |
++----------+------------+----------------+----------------+------------+------------+------------+-----------+---------+---------+
+|        1 | Cricket    | Royal Strikers | Vizag Warriors | 2026-11-02 | 16:00:00   | TOURNAMENT | LIVE      |       0 |       0 |
+|        2 | Football   | Vizag FC       | Vizag Warriors | 2026-10-25 | 17:00:00   | OPPONENT   | SCHEDULED |       0 |       0 |
+|        3 | Basketball | Hoop Warriors  | Vizag Dunkers  | 2026-10-28 | 18:00:00   | NORMAL     | SCHEDULED |       0 |       0 |
++----------+------------+----------------+----------------+------------+------------+------------+-----------+---------+---------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT * FROM v_player_leaderboard;
++---------+--------------+------------+----------------+------+--------+--------+------+-------+
+| user_id | full_name    | sport_name | matches_played | wins | losses | points | runs | goals |
++---------+--------------+------------+----------------+------+--------+--------+------+-------+
+|       1 | Nikhil       | Cricket    |              5 |    3 |      2 |     18 |  210 |     0 |
+|       2 | Rahul Sharma | Cricket    |              4 |    2 |      2 |     12 |  150 |     0 |
+|       1 | Nikhil       | Football   |              3 |    2 |      1 |      6 |    0 |     4 |
+|       7 | Kiran Das    | Basketball |              4 |    3 |      1 |     22 |    0 |     0 |
+|       8 | Vamsi Teja   | Badminton  |              5 |    4 |      1 |     30 |    0 |     0 |
++---------+--------------+------------+----------------+------+--------+--------+------+-------+
+5 rows in set (0.00 sec)
+
